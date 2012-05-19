@@ -51,7 +51,7 @@ function MathGraph(id, mouse)
     
 	this.Canvas = document.getElementById(id);
 	this.Ctx = null;
-	
+    
 	this.Width = this.Canvas.width;
 	this.Height = this.Canvas.height;
 	
