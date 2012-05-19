@@ -37,11 +37,18 @@
 
 function MathGraph(id, mouse)
 {
+    var dragging = false;
+    
 	if (mouse == null)
 	{
 		mouse = 'click';
 	}
-	
+    else if (mouse == 'drag')
+    {
+        dragging = true;
+        mouse = 'click';
+    }
+    
 	this.Canvas = document.getElementById(id);
 	this.Ctx = null;
 	
@@ -51,30 +58,88 @@ function MathGraph(id, mouse)
 	this.MaxY = this.MaxX * this.Height / this.Width;
 	this.MinY = this.MinX * this.Height / this.Width;
 	
-	this._addEvent(this.Canvas,mouse,function(e){
-		if (e == null)
-		{
-			e = window.event;
-		}
-		// physical coordinates of the click
-		x = e.offsetX?(e.offsetX):e.pageX-document.getElementById(id).offsetLeft;
-		y = e.offsetY?(e.offsetY):e.pageY-document.getElementById(id).offsetTop;
-		
-		// logical coordinates rounded to two decimal places
-		xr = Math.round(this.XCi(x)*Math.pow(10,2))/Math.pow(10,2);
-		yr = Math.round(this.YCi(y)*Math.pow(10,2))/Math.pow(10,2);
-		
-		for (f in this.Functions)
-		{
-			fy = this.Functions[f](xr);
-			if (fy > (yr-this.YTick/2) && fy < (yr+this.YTick/2))
-			{
-				this.DrawDot(f,this.XCi(x),true);
-				break;
-			}
-		}
-	},this);
-	
+    
+    this._addEvent(this.Canvas,mouse,function(e){
+        if (e == null)
+        {
+            e = window.event;
+        }
+        // physical coordinates of the click
+        x = e.offsetX?(e.offsetX):e.pageX-document.getElementById(id).offsetLeft;
+        y = e.offsetY?(e.offsetY):e.pageY-document.getElementById(id).offsetTop;
+        
+        // logical coordinates rounded to two decimal places
+        xr = Math.round(this.XCi(x)*Math.pow(10,2))/Math.pow(10,2);
+        yr = Math.round(this.YCi(y)*Math.pow(10,2))/Math.pow(10,2);
+        
+        for (f in this.Functions)
+        {
+            fy = this.Functions[f](xr);
+            if (fy > (yr-this.YTick/2) && fy < (yr+this.YTick/2))
+            {
+                this.DrawDot(f,this.XCi(x),true);
+                break;
+            }
+        }
+    },this);
+    
+    
+    if (dragging)
+    {
+        this._addEvent(this.Canvas,'mousedown',function(e){
+            if (e == null)
+            {
+                e = window.event;
+            }
+            // physical coordinates of the click
+            x = e.offsetX?(e.offsetX):e.pageX-document.getElementById(id).offsetLeft;
+            y = e.offsetY?(e.offsetY):e.pageY-document.getElementById(id).offsetTop;
+            
+            // logical coordinates rounded to two decimal places
+            xr = Math.round(this.XCi(x)*Math.pow(10,2))/Math.pow(10,2);
+            yr = Math.round(this.YCi(y)*Math.pow(10,2))/Math.pow(10,2);
+            
+            for (f in this.Functions)
+            {
+                fy = this.Functions[f](xr);
+                if (fy > (yr-this.YTick/2) && fy < (yr+this.YTick/2))
+                {
+                    this.draggable = f;
+                    break;
+                }
+            }
+        }, this);
+        
+        this._addEvent(this.Canvas,'mousemove',function(e){
+            if (e == null)
+            {
+                e = window.event;
+            }
+            // physical coordinates of the click
+            x = e.offsetX?(e.offsetX):e.pageX-document.getElementById(id).offsetLeft;
+            y = e.offsetY?(e.offsetY):e.pageY-document.getElementById(id).offsetTop;
+            
+            // logical coordinates rounded to two decimal places
+            xr = Math.round(this.XCi(x)*Math.pow(10,2))/Math.pow(10,2);
+            yr = Math.round(this.YCi(y)*Math.pow(10,2))/Math.pow(10,2);
+            
+            if (this.draggable)
+            {
+                fy = this.Functions[this.draggable](xr);
+                if (fy > (yr-this.YTick) && fy < (yr+this.YTick))
+                {
+                    this.DrawDot(this.draggable,this.XCi(x),true);
+                }
+            }
+            
+        }, this);
+        
+        this._addEvent(this.Canvas,'mouseup',function(e){
+            this.draggable = false;
+        }, this);
+    }
+    
+    
 	this._addEvent(document,'keydown',function(e){
 		if (e == null)
 		{
@@ -90,6 +155,8 @@ function MathGraph(id, mouse)
 MathGraph.prototype = {
 	constructor : MathGraph,
 	
+    draggable : false,
+    
 	Functions : {},
 	FColors : {},
 	
