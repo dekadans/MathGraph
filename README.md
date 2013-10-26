@@ -8,7 +8,7 @@ Uses HTML5 Canvas. Supported in newer versions of the major browsers.
 This is an expanded and reworked version of the example from:
 http://matt.might.net/articles/rendering-mathematical-functions-in-javascript-with-canvas-html/
 
-Live example: http://www.tthe.se/files/documents/graph/
+Live example: http://dev.tthe.se/mathgraph/
 
 Setup
 -----
